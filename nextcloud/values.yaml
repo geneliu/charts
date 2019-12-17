@@ -1,0 +1,493 @@
+affinity: {}
+cronjob:
+  annotations: {}
+  curlInsecure: false
+  enabled: false
+  failedJobsHistoryLimit: 5
+  image: {}
+  schedule: '*/15 * * * *'
+  successfulJobsHistoryLimit: 2
+externalDatabase:
+  database: nextcloud
+  enabled: false
+  host: null
+  password: null
+  type: mysql
+  user: nextcloud
+fullnameOverride: ""
+image:
+  pullPolicy: IfNotPresent
+  repository: nextcloud
+  tag: 17.0.0-apache
+ingress:
+  annotations: {}
+  enabled: false
+  labels: {}
+internalDatabase:
+  enabled: true
+  name: nextcloud
+lifecycle: {}
+livenessProbe:
+  enabled: true
+  failureThreshold: 3
+  initialDelaySeconds: 30
+  periodSeconds: 15
+  successThreshold: 1
+  timeoutSeconds: 5
+mariadb:
+  db:
+    forcePassword: false
+    name: nextcloud
+    password: changeme
+    user: nextcloud
+  enabled: false
+  global: {}
+  image:
+    debug: false
+    pullPolicy: IfNotPresent
+    registry: docker.io
+    repository: bitnami/mariadb
+    tag: 10.3.20-debian-9-r0
+  master:
+    affinity: {}
+    antiAffinity: soft
+    config: |-
+      [mysqld]
+      skip-name-resolve
+      explicit_defaults_for_timestamp
+      basedir=/opt/bitnami/mariadb
+      plugin_dir=/opt/bitnami/mariadb/plugin
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      tmpdir=/opt/bitnami/mariadb/tmp
+      max_allowed_packet=16M
+      bind-address=0.0.0.0
+      pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+      log-error=/opt/bitnami/mariadb/logs/mysqld.log
+      character-set-server=UTF8
+      collation-server=utf8_general_ci
+
+      [client]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      default-character-set=UTF8
+      plugin_dir=/opt/bitnami/mariadb/plugin
+
+      [manager]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+    extraInitContainers: ""
+    livenessProbe:
+      enabled: true
+      failureThreshold: 3
+      initialDelaySeconds: 120
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    nodeSelector: {}
+    persistence:
+      accessModes:
+      - ReadWriteOnce
+      annotations: {}
+      enabled: true
+      mountPath: /bitnami/mariadb
+      size: 8Gi
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: 1
+    readinessProbe:
+      enabled: true
+      failureThreshold: 3
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources: {}
+    service:
+      annotations: {}
+    tolerations: []
+    updateStrategy:
+      type: RollingUpdate
+  metrics:
+    annotations:
+      prometheus.io/port: "9104"
+      prometheus.io/scrape: "true"
+    enabled: false
+    extraArgs:
+      master: []
+      slave: []
+    image:
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: bitnami/mysqld-exporter
+      tag: 0.12.1-debian-9-r96
+    livenessProbe:
+      enabled: true
+      failureThreshold: 3
+      initialDelaySeconds: 120
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    readinessProbe:
+      enabled: true
+      failureThreshold: 3
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources: {}
+    serviceMonitor:
+      enabled: false
+      selector:
+        prometheus: kube-prometheus
+  persistence:
+    accessMode: ReadWriteOnce
+    enabled: false
+    size: 8Gi
+  rbac:
+    create: false
+  replication:
+    enabled: true
+    forcePassword: false
+    password: null
+    user: replicator
+  rootUser:
+    forcePassword: false
+    password: null
+  securityContext:
+    enabled: true
+    fsGroup: 1001
+    runAsUser: 1001
+  service:
+    port: 3306
+    type: ClusterIP
+  serviceAccount:
+    create: false
+  slave:
+    affinity: {}
+    antiAffinity: soft
+    config: |-
+      [mysqld]
+      skip-name-resolve
+      explicit_defaults_for_timestamp
+      basedir=/opt/bitnami/mariadb
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      tmpdir=/opt/bitnami/mariadb/tmp
+      max_allowed_packet=16M
+      bind-address=0.0.0.0
+      pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+      log-error=/opt/bitnami/mariadb/logs/mysqld.log
+      character-set-server=UTF8
+      collation-server=utf8_general_ci
+
+      [client]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      default-character-set=UTF8
+
+      [manager]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+    extraInitContainers: ""
+    livenessProbe:
+      enabled: true
+      failureThreshold: 3
+      initialDelaySeconds: 120
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    nodeSelector: {}
+    persistence:
+      accessModes:
+      - ReadWriteOnce
+      annotations: null
+      enabled: true
+      size: 8Gi
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: 1
+    readinessProbe:
+      enabled: true
+      failureThreshold: 3
+      initialDelaySeconds: 45
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    replicas: 1
+    resources: {}
+    service:
+      annotations: {}
+    tolerations: []
+    updateStrategy:
+      type: RollingUpdate
+  tests:
+    enabled: true
+    testFramework:
+      image:
+        registry: docker.io
+        repository: dduportal/bats
+        tag: 0.4.0
+  volumePermissions:
+    enabled: false
+    image:
+      pullPolicy: Always
+      registry: docker.io
+      repository: bitnami/minideb
+      tag: stretch
+    resources: {}
+nameOverride: ""
+nextcloud:
+  configs: {}
+  datadir: /var/www/html/data
+  defaultConfigs:
+    .htaccess: true
+    apache-pretty-urls.config.php: true
+    apcu.config.php: true
+    apps.config.php: true
+    autoconfig.php: true
+    redis.config.php: true
+    smtp.config.php: true
+  extraEnv: null
+  host: nextcloud.kube.home
+  mail:
+    domain: domain.com
+    enabled: false
+    fromAddress: user
+    smtp:
+      authtype: LOGIN
+      host: domain.com
+      name: user
+      password: pass
+      port: 465
+      secure: ssl
+  password: changeme
+  phpConfigs: {}
+  tableprefix: null
+  update: 0
+  username: admin
+nginx:
+  config:
+    default: true
+  enabled: false
+  image:
+    pullPolicy: IfNotPresent
+    repository: nginx
+    tag: alpine
+  resources: {}
+nodeSelector: {}
+persistence:
+  accessMode: ReadWriteOnce
+  annotations: {}
+  enabled: false
+  size: 8Gi
+readinessProbe:
+  enabled: true
+  failureThreshold: 3
+  initialDelaySeconds: 30
+  periodSeconds: 15
+  successThreshold: 1
+  timeoutSeconds: 5
+redis:
+  cluster:
+    enabled: true
+    slaveCount: 2
+  clusterDomain: cluster.local
+  configmap: |-
+    # Enable AOF https://redis.io/topics/persistence#append-only-file
+    appendonly yes
+    # Disable RDB persistence, AOF persistence already enabled.
+    save ""
+  enabled: false
+  global:
+    redis: {}
+  image:
+    pullPolicy: IfNotPresent
+    registry: docker.io
+    repository: bitnami/redis
+    tag: 5.0.7-debian-9-r0
+  master:
+    affinity: {}
+    command: /run.sh
+    configmap: null
+    disableCommands:
+    - FLUSHDB
+    - FLUSHALL
+    extraFlags: []
+    livenessProbe:
+      enabled: true
+      failureThreshold: 5
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 5
+    persistence:
+      accessModes:
+      - ReadWriteOnce
+      enabled: true
+      path: /data
+      size: 8Gi
+      subPath: ""
+    podAnnotations: {}
+    podLabels: {}
+    readinessProbe:
+      enabled: true
+      failureThreshold: 5
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 1
+    service:
+      annotations: {}
+      labels: {}
+      loadBalancerIP: null
+      port: 6379
+      type: ClusterIP
+    statefulset:
+      updateStrategy: RollingUpdate
+  metrics:
+    enabled: false
+    image:
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: bitnami/redis-exporter
+      tag: 1.3.4-debian-9-r4
+    podAnnotations:
+      prometheus.io/port: "9121"
+      prometheus.io/scrape: "true"
+    service:
+      annotations: {}
+      labels: {}
+      type: ClusterIP
+    serviceMonitor:
+      enabled: false
+      selector:
+        prometheus: kube-prometheus
+  networkPolicy:
+    enabled: false
+  persistence: {}
+  podSecurityPolicy:
+    create: false
+  rbac:
+    create: false
+    role:
+      rules: []
+  redisPort: 6379
+  securityContext:
+    enabled: true
+    fsGroup: 1001
+    runAsUser: 1001
+  sentinel:
+    configmap: null
+    downAfterMilliseconds: 60000
+    enabled: false
+    failoverTimeout: 18000
+    image:
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: bitnami/redis-sentinel
+      tag: 5.0.6-debian-9-r6
+    initialCheckTimeout: 5
+    livenessProbe:
+      enabled: true
+      failureThreshold: 5
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 5
+    masterSet: mymaster
+    parallelSyncs: 1
+    port: 26379
+    quorum: 2
+    readinessProbe:
+      enabled: true
+      failureThreshold: 5
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 1
+    service:
+      annotations: {}
+      labels: {}
+      loadBalancerIP: null
+      redisPort: 6379
+      sentinelPort: 26379
+      type: ClusterIP
+    usePassword: true
+  serviceAccount:
+    create: false
+    name: null
+  slave:
+    affinity: {}
+    command: /run.sh
+    configmap: null
+    disableCommands:
+    - FLUSHDB
+    - FLUSHALL
+    extraFlags: []
+    livenessProbe:
+      enabled: true
+      failureThreshold: 5
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    persistence:
+      accessModes:
+      - ReadWriteOnce
+      enabled: true
+      path: /data
+      size: 8Gi
+      subPath: ""
+    podAnnotations: {}
+    podLabels: {}
+    port: 6379
+    readinessProbe:
+      enabled: true
+      failureThreshold: 5
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 10
+    service:
+      annotations: {}
+      labels: {}
+      loadBalancerIP: null
+      port: 6379
+      type: ClusterIP
+    statefulset:
+      updateStrategy: RollingUpdate
+  sysctlImage:
+    command: []
+    enabled: false
+    mountHostSys: false
+    pullPolicy: Always
+    registry: docker.io
+    repository: bitnami/minideb
+    resources: {}
+    tag: stretch
+  usePassword: false
+  usePasswordFile: false
+  volumePermissions:
+    enabled: false
+    image:
+      pullPolicy: Always
+      registry: docker.io
+      repository: bitnami/minideb
+      tag: stretch
+    resources: {}
+replicaCount: 1
+resources: {}
+service:
+  loadBalancerIP: nil
+  port: 8080
+  type: ClusterIP
+tolerations: []
+# Mount local hostpath
+hostMounts: []
+  # Example
+  # - name: data
+  #   hostPath: /opt/local/data
+  #   mountPath: /opt/local/data 
