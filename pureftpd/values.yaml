@@ -1,0 +1,30 @@
+# Default values for helm.
+replicaCount: 1
+ftp:
+  image:
+    repository: stilliard/pure-ftpd
+    tag: hardened
+    pullPolicy: IfNotPresent
+  passive:
+    portMin: 30000
+    portMax: 30009
+  userName: hass
+  userPassword:
+securityContext:
+  sfGroup: 1000
+service:
+  type: NodePort # or ClusterIP/NodePort/LoadBalancer
+  externalPort: 32021
+  internalPort: 21
+  clusterIP:
+  loadBalancerIP:
+  externalIPs: 
+    - 192.168.96.8
+persistence:
+  accessMode: ReadWriteOnce
+  annotations: {}
+  enabled: false
+  size: 8Gi
+nodeSelector: {}
+hostNetwork: false
+resources: {}

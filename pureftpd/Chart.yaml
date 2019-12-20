@@ -1,0 +1,8 @@
+apiVersion: v1
+appVersion: latest
+description: pure-ftpd
+maintainers:
+  - email: gjunliu@gmail.com
+    name: geneliu
+name: pure-ftpd
+version: 0.1.0

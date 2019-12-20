@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "ftp.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "ftp.name" . }}
+    helm.sh/chart: {{ include "ftp.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "ftp.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "ftp.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      hostNetwork: {{ .Values.hostNetwork }}
+      dnsPolicy: ClusterFirstWithHostNet
+      securityContext:
+        fsGroup: {{ .Values.securityContext.sfGroup }}
+      containers:
+        - name: ftp
+          image: "{{ .Values.ftp.image.repository }}:{{ .Values.ftp.image.tag }}"
+          imagePullPolicy: {{ .Values.ftp.image.pullPolicy }}
+          env:
+          - name: PUBLICHOST
+            value: localhost
+          {{- if .Values.ftp.userName }}
+          - name: FTP_USER_NAME
+            value: {{ .Values.ftp.userName }}
+          - name: FTP_USER_HOME
+            value: /home/{{ .Values.ftp.userName }}
+          {{- end }}
+          {{- if .Values.ftp.userPassword }}
+          - name: FTP_USER_PASS
+            value: {{ .Values.ftp.userPassword | quote }}
+          {{- end }}
+          ports:
+            - containerPort: {{ .Values.service.internalPort }}
+          {{- range $e := until (sub .Values.ftp.passive.portMax .Values.ftp.passive.portMin | add1 | int) }}
+            - containerPort: {{ add $.Values.ftp.passive.portMin . }}
+          {{- end }}
+        {{- if .Values.persistence.enabled }}
+          volumeMounts:
+            - name: ftp-data
+              mountPath: /home/{{ .Values.ftp.username }}
+              subPath: data
+            - name: ftp-data
+              mountPath: /etc/pure-ftpd
+              subPath: config
+        {{- end }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- if .Values.persistence.enabled }}
+      volumes:
+        - name: ftp-data
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "ftp.fullname" . }}-ftp{{- end }}
+    {{- end }}
+    {{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+    {{- end }}
